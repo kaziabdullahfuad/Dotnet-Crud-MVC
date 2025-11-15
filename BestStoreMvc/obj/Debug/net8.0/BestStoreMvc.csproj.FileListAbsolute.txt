@@ -134,3 +134,4 @@ D:\Dotnet C#\Tutorials\Crud Operations\BestStoreMvc\bin\Debug\net8.0\runtimes\wi
 D:\Dotnet C#\Tutorials\Crud Operations\BestStoreMvc\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\Dotnet C#\Tutorials\Crud Operations\BestStoreMvc\obj\Debug\net8.0\BestStoreMvc.csproj.AssemblyReference.cache
 D:\Dotnet C#\Tutorials\Crud Operations\BestStoreMvc\obj\Debug\net8.0\BestStor.2AE2F688.Up2Date
+D:\Dotnet C#\Tutorials\Crud Operations\BestStoreMvc\obj\Debug\net8.0\BestStoreMvc.sourcelink.json
