@@ -245,6 +245,10 @@
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
     },
     {
+      "Id": "D:\\Dotnet C#\\Tutorials\\Crud Operations\\BestStoreMvc\\wwwroot\\products\\20251113214625012.png",
+      "PackagePath": "staticwebassets\\products\\20251113214625012.png"
+    },
+    {
       "Id": "D:\\Dotnet C#\\Tutorials\\Crud Operations\\BestStoreMvc\\wwwroot\\products\\234.jpg",
       "PackagePath": "staticwebassets\\products\\234.jpg"
     },

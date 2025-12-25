@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BestStoreMvc")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d3cdd256888074c2dfb4945e44a93498b2d03ae4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cf8e2215d58541ca3f15f702866e219f3990f97c")]
 [assembly: System.Reflection.AssemblyProductAttribute("BestStoreMvc")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BestStoreMvc")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

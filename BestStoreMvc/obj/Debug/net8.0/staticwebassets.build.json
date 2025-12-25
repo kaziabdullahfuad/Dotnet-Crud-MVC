@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "qi98yH0JeQWkXt8qrPrYBn1cBiDQTW0KWpTeC3Cfxk4=",
+  "Hash": "hDdmzWcJ/0+oLphhGotJlEoxEctS1wc6yJZrfEmme4I=",
   "Source": "BestStoreMvc",
   "BasePath": "_content/BestStoreMvc",
   "Mode": "Default",
@@ -1193,6 +1193,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Identity": "D:\\Dotnet C#\\Tutorials\\Crud Operations\\BestStoreMvc\\wwwroot\\products\\20251113214625012.png",
+      "SourceId": "BestStoreMvc",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Dotnet C#\\Tutorials\\Crud Operations\\BestStoreMvc\\wwwroot\\",
+      "BasePath": "_content/BestStoreMvc",
+      "RelativePath": "products/20251113214625012.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\products\\20251113214625012.png"
     },
     {
       "Identity": "D:\\Dotnet C#\\Tutorials\\Crud Operations\\BestStoreMvc\\wwwroot\\products\\234.jpg",
