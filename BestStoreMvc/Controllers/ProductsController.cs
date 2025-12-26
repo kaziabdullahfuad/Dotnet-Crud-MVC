@@ -1,5 +1,6 @@
 
 using BestStoreMvc.Models;
+using BestStoreMvc.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BestStoreMvc.Controllers
@@ -8,15 +9,19 @@ namespace BestStoreMvc.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment environment;
-        public ProductsController(ApplicationDbContext context,IWebHostEnvironment environment)
+        private readonly IProductRepository _repo;
+        public ProductsController(ApplicationDbContext context,IWebHostEnvironment environment, IProductRepository repo)
         {
             this.context = context;
             this.environment = environment;
+            this._repo = repo;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             // var products = context.Products.ToList();
-            var products = context.Products.OrderByDescending(p => p.Id).ToList();
+            // var products = context.Products.OrderByDescending(p => p.Id).ToList();
+            // return View(products);
+            var products= await _repo.GetAllAsync();
             return View(products);
         }
 
