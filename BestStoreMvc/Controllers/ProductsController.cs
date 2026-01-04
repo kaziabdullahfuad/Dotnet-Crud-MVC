@@ -1,18 +1,20 @@
 
+using System.Threading.Tasks;
 using BestStoreMvc.Models;
 using BestStoreMvc.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BestStoreMvc.Controllers
 {
     public class ProductsController: Controller
     {
-        private readonly ApplicationDbContext context;
+       //private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment environment;
         private readonly IProductRepository _repo;
         public ProductsController(ApplicationDbContext context,IWebHostEnvironment environment, IProductRepository repo)
         {
-            this.context = context;
+            //this.context = context;
             this.environment = environment;
             this._repo = repo;
         }
@@ -31,50 +33,60 @@ namespace BestStoreMvc.Controllers
             return View();
         }
 
+        // POST: /Products/Create
         [HttpPost]
-        public IActionResult Create(ProductDto productDto)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ProductDto dto)
         {
-            if (productDto.ImageFile == null)
+            if(dto.ImageFile== null)
             {
-                ModelState.AddModelError("ImageFile", "The Image field is required.");
+                ModelState.AddModelError(nameof(dto.ImageFile), "The Image field is required.");
             }
 
             if (!ModelState.IsValid)
             {
-                return View(productDto);
+                return View(dto);
             }
 
-            // save the image file
-            string newFileName = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-            newFileName += Path.GetExtension(productDto.ImageFile!.FileName);
-
-            string imageFullPath = environment.WebRootPath + "/products/" + newFileName;
-            using (var stream = System.IO.File.Create(imageFullPath))
+            // ensure folder exists
+            var uploads=Path.Combine(environment.WebRootPath,"products");
+            if(!Directory.Exists(uploads))
             {
-                productDto.ImageFile.CopyTo(stream);
+                Directory.CreateDirectory(uploads);
             }
 
-            // save the product to database
-            Product product = new Product
+            // unique filename
+            var newFileName=$"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+            var fullPath=Path.Combine(uploads,newFileName);
+
+            await using(var fs = System.IO.File.Create(fullPath))
             {
-                Name = productDto.Name,
-                Brand = productDto.Brand,
-                Category = productDto.Category,
-                Price = productDto.Price,
-                Description = productDto.Description,
-                ImageFileName = newFileName,
-                CreatedAt = DateTime.Now,
+                await dto.ImageFile.CopyToAsync(fs);
+            }
+
+            var product=new Product
+            {
+                Name=dto.Name,
+                Brand=dto.Brand,
+                Category=dto.Category,
+                Price=dto.Price,
+                Description=dto.Description,
+                ImageFileName=newFileName,
+                CreatedAt=DateTime.UtcNow
             };
 
-            context.Products.Add(product);
-            context.SaveChanges();
+            await _repo.AddAsync(product);
 
-            return RedirectToAction("Index", "Products");
+            return RedirectToAction(nameof(Index));
         }
-
-        public IActionResult Edit(int id)
+        
+        public async Task<IActionResult> Edit(int id)
         {
-            var product = context.Products.Find(id);
+            var product= await _repo.GetByIdAsync(id);
+            if (product == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
             if (product == null)
             {
@@ -100,75 +112,75 @@ namespace BestStoreMvc.Controllers
             return View(productDto);
         }
 
+        // POST: /Products/Edit/5
         [HttpPost]
-        public IActionResult Edit(int id, ProductDto productDto)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, ProductDto dto)
         {
-            var product = context.Products.Find(id);
-
-            if (product == null)
-            {
-                return RedirectToAction("Index", "Products");
-            }
+            var product= await _repo.GetByIdAsync(id);
+            if (product == null) return RedirectToAction(nameof(Index));
 
             if (!ModelState.IsValid)
             {
-                ViewData["ProductId"] = product.Id;
-                ViewData["ImageFileName"] = product.ImageFileName;
-                ViewData["CreatedAt"] = product.CreatedAt.ToString("MM/dd/yyyy");
-
-                return View(productDto);
+               ViewData["ProductId"]=product.Id;
+               ViewData["ImageFileName"]=product.ImageFileName;
+               ViewData["CreatedAt"]=product.CreatedAt.ToString("MM/dd/yyyy");
+               return View(dto);
             }
 
-            // update the image file if a new file is uploaded
-            string newFileName = product.ImageFileName;
-            if (productDto.ImageFile != null)
-            {
-                newFileName = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-                newFileName += Path.GetExtension(productDto.ImageFile.FileName);
+            // update fields
+            product.Name=dto.Name;
+            product.Brand=dto.Brand;
+            product.Category=dto.Category;
+            product.Price=dto.Price;
+            product.Description=dto.Description;
 
-                string imageFullPath = environment.WebRootPath + "/products/" + newFileName;
-                using (var stream = System.IO.File.Create(imageFullPath))
+            if (dto.ImageFile != null)
+            {
+                var uploads=Path.Combine(environment.WebRootPath,"products");
+                if (!Directory.Exists(uploads))
                 {
-                    productDto.ImageFile.CopyTo(stream);
+                    Directory.CreateDirectory(uploads);
+                }
+                var newFileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+                var fullPath = Path.Combine(uploads, newFileName);
+
+                await using (var fs = System.IO.File.Create(fullPath))
+                {
+                    await dto.ImageFile.CopyToAsync(fs);
+                }
+                 // optional: delete old file
+                if (!string.IsNullOrEmpty(product.ImageFileName))
+                {
+                    var oldPath = Path.Combine(uploads, product.ImageFileName);
+                    if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
                 }
 
-                // delete the old image file
-                string oldImageFullPath = environment.WebRootPath + "/products/" + product.ImageFileName;
-                System.IO.File.Delete(oldImageFullPath);
-
+                product.ImageFileName = newFileName;
             }
 
-            // update the product in the database
-            product.Name = productDto.Name;
-            product.Brand = productDto.Brand;
-            product.Category = productDto.Category;
-            product.Price = productDto.Price;
-            product.Description = productDto.Description;
-            product.ImageFileName = newFileName;
-
-            context.SaveChanges();
-
-            return RedirectToAction("Index", "Products");
+           await _repo.UpdateAsync(product);
+           return RedirectToAction(nameof(Index));
         }
         
-
-        public IActionResult Delete(int id)
+         // DELETE action example
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            var product = context.Products.Find(id);
+            var product= await _repo.GetByIdAsync(id);
+            if (product == null) return NotFound();
 
-            if (product == null)
+            // optionally delete file
+            if (!string.IsNullOrEmpty(product.ImageFileName))
             {
-                return RedirectToAction("Index", "Products");
+                var path = Path.Combine(environment.WebRootPath, "products", product.ImageFileName);
+                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
             }
 
-            // have to delete the image file from wwwroot/products folder
-            string imageFullPath = environment.WebRootPath + "/products/" + product.ImageFileName;
-            System.IO.File.Delete(imageFullPath);
-
-            context.Products.Remove(product);
-            context.SaveChanges(true);
-
-            return RedirectToAction("Index", "Products");
+            await _repo.DeleteAsync(product);
+            return RedirectToAction(nameof(Index));
+           
         }
     }
 }
